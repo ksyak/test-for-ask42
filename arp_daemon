@@ -1,0 +1,34 @@
+#!/bin/bash
+# chkconfig: 2345 20 80
+# description: test case
+# Source function library.
+. /etc/init.d/functions
+
+case "$1" in
+start)
+ echo "$(date) service arp_daemon checker started"  >> /var/log/arp.log
+ /opt/arp_t.sh &
+ echo $!>/var/run/arp_daemon.pid
+ ;;
+stop)
+ echo "$(date) service arp_daemon checker stopped"  >> /var/log/arp.log
+ kill 'cat /var/run/arp_daemon.pid'
+ rm /var/run/arp_daemon.pid
+ ;;
+restart)
+ $0 stop
+ $0 start
+ ;;
+status)
+ if [ -e /var/run/arp_daemon.pid ]; then
+  echo arp_daemin is running, pid=$(cat /var/run/arp_daemon.pid)
+ else
+  echo arp_daemon is not running
+  exit 1
+ fi
+ ;;
+*)
+ echo "Usage:$0 {start|stop|restart|status}"
+esac
+
+exit 0
